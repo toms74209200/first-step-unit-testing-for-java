@@ -17,16 +17,28 @@ public class ProductRepository {
     public ProductRepository() {
         this.products =
                 Arrays.asList(
-                        new Product("PROD001", "iPhone 15", BigDecimal.valueOf(120000), 50),
-                        new Product("PROD002", "MacBook Pro", BigDecimal.valueOf(280000), 25),
-                        new Product("PROD003", "iPad Air", BigDecimal.valueOf(80000), 30),
-                        new Product("PROD004", "AirPods Pro", BigDecimal.valueOf(35000), 100),
-                        new Product("PROD005", "Apple Watch", BigDecimal.valueOf(50000), 75),
-                        new Product("BOOK001", "Spring Boot入門", BigDecimal.valueOf(3200), 200),
-                        new Product("BOOK002", "Java完全ガイド", BigDecimal.valueOf(4500), 150),
-                        new Product("ELEC001", "ワイヤレスキーボード", BigDecimal.valueOf(8000), 80),
-                        new Product("ELEC002", "4Kモニター", BigDecimal.valueOf(45000), 15),
-                        new Product("GAME001", "Nintendo Switch", BigDecimal.valueOf(32000), 60));
+                        new Product("PROD001", "iPhone 15", BigDecimal.valueOf(120000), 50, false),
+                        new Product(
+                                "PROD002", "MacBook Pro", BigDecimal.valueOf(280000), 25, false),
+                        new Product("PROD003", "iPad Air", BigDecimal.valueOf(80000), 30, false),
+                        new Product(
+                                "PROD004", "AirPods Pro", BigDecimal.valueOf(35000), 100, false),
+                        new Product("PROD005", "Apple Watch", BigDecimal.valueOf(50000), 75, false),
+                        new Product(
+                                "BOOK001", "Spring Boot入門", BigDecimal.valueOf(3200), 200, false),
+                        new Product("BOOK002", "Java完全ガイド", BigDecimal.valueOf(4500), 150, false),
+                        new Product("ELEC001", "ワイヤレスキーボード", BigDecimal.valueOf(8000), 80, false),
+                        new Product("ELEC002", "4Kモニター", BigDecimal.valueOf(45000), 15, false),
+                        new Product(
+                                "GAME001", "Nintendo Switch", BigDecimal.valueOf(32000), 60, false),
+                        new Product(
+                                "PRE001", "iPhone 16 Pro（予約）", BigDecimal.valueOf(150000), 0, true),
+                        new Product(
+                                "PRE002",
+                                "MacBook Air M3（予約）",
+                                BigDecimal.valueOf(180000),
+                                0,
+                                true));
     }
 
     @Nonnull

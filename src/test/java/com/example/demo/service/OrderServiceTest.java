@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.example.demo.domain.Order;
+import com.example.demo.domain.OrderType;
 import com.example.demo.domain.Product;
 import com.example.demo.exception.InsufficientStockException;
 import com.example.demo.exception.InvalidOrderException;
@@ -42,7 +43,8 @@ public class OrderServiceTest {
                                         expectedProductCode,
                                         "Test Product",
                                         BigDecimal.valueOf(100),
-                                        stock)));
+                                        stock,
+                                        false)));
         OrderRepository orderRepositoryMock = mock(OrderRepository.class);
         when(orderRepositoryMock.save(any(Order.class)))
                 .thenReturn(
@@ -51,7 +53,62 @@ public class OrderServiceTest {
                                 expectedProductCode,
                                 expectedQuantity,
                                 BigDecimal.valueOf(100),
-                                Instant.now()));
+                                Instant.now(),
+                                OrderType.NORMAL));
+
+        OrderService orderService = new OrderService(productRepositoryMock, orderRepositoryMock);
+
+        // Act: 注文する
+        Order order;
+        try {
+            order =
+                    orderService.processOrder(
+                            new OrderRequest(expectedProductCode, expectedQuantity));
+        } catch (InvalidOrderException | InsufficientStockException | OrderFailedException e) {
+            e.printStackTrace();
+            fail();
+            return;
+        }
+
+        assertThat(order.id()).isNotBlank();
+        // Assert: 注文の商品コードが一致する
+        assertThat(order.productCode()).isEqualTo(expectedProductCode);
+        // Assert: 注文の数量が一致する
+        assertThat(order.quantity()).isEqualTo(expectedQuantity);
+        // Assert: 注文の金額が正しい
+        assertThat(order.amount().longValue()).isGreaterThan(0);
+        assertThat(order.timestamp().toEpochMilli()).isGreaterThanOrEqualTo(before.toEpochMilli());
+    }
+
+    // 存在する予約商品の商品コードで注文したとき、成功する
+    @Test
+    public void testProcessWhenReservationOrderSucceeded() throws Exception {
+        String expectedProductCode = "reservation-test";
+        int expectedQuantity = new Random().nextInt(1, 10);
+        Instant before = Instant.now();
+        int stock = 10;
+
+        ProductRepository productRepositoryMock = mock(ProductRepository.class);
+        // Arrange: 注文の商品コードが存在する
+        when(productRepositoryMock.findByCode(anyString()))
+                .thenReturn(
+                        Optional.of(
+                                new Product(
+                                        expectedProductCode,
+                                        "Reservation Product",
+                                        BigDecimal.valueOf(100),
+                                        stock,
+                                        true)));
+        OrderRepository orderRepositoryMock = mock(OrderRepository.class);
+        when(orderRepositoryMock.save(any(Order.class)))
+                .thenReturn(
+                        new Order(
+                                "reservation-test-id",
+                                expectedProductCode,
+                                expectedQuantity,
+                                BigDecimal.valueOf(100),
+                                Instant.now(),
+                                OrderType.RESERVATION));
 
         OrderService orderService = new OrderService(productRepositoryMock, orderRepositoryMock);
 

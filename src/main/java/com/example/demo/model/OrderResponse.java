@@ -1,3 +1,3 @@
 package com.example.demo.model;
 
-public record OrderResponse(String orderId, long amount, String timestamp) {}
+public record OrderResponse(String orderId, long amount, String timestamp, String orderType) {}

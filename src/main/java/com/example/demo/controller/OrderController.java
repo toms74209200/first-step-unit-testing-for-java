@@ -39,7 +39,10 @@ public class OrderController {
 
         OrderResponse response =
                 new OrderResponse(
-                        order.id(), order.amount().longValue(), order.timestamp().toString());
+                        order.id(),
+                        order.amount().longValue(),
+                        order.timestamp().toString(),
+                        order.orderType().getDisplayName());
         return ResponseEntity.ok(response);
     }
 

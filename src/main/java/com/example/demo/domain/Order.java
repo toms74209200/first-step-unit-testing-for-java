@@ -4,4 +4,9 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 public record Order(
-        String id, String productCode, int quantity, BigDecimal amount, Instant timestamp) {}
+        String id,
+        String productCode,
+        int quantity,
+        BigDecimal amount,
+        Instant timestamp,
+        OrderType orderType) {}

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.example.demo.domain.Order;
@@ -31,11 +33,11 @@ public class OrderServiceTest {
         int expectedQuantity = new Random().nextInt(1, 10);
         Instant before = Instant.now();
 
-        // Arrange: 注文の数量が在庫数以下
+        // Arrange: 注文の数量が在庫数以下のとき
         int stock = expectedQuantity + 1;
 
         ProductRepository productRepositoryMock = mock(ProductRepository.class);
-        // Arrange: 注文の商品コードが存在する
+        // Arrange: 注文の商品コードが存在するとき
         when(productRepositoryMock.findByCode(anyString()))
                 .thenReturn(
                         Optional.of(
@@ -71,25 +73,30 @@ public class OrderServiceTest {
         }
 
         assertThat(order.id()).isNotBlank();
-        // Assert: 注文の商品コードが一致する
+        // Assert: 注文の商品コードが一致するか
         assertThat(order.productCode()).isEqualTo(expectedProductCode);
-        // Assert: 注文の数量が一致する
+        // Assert: 注文の数量が一致するか
         assertThat(order.quantity()).isEqualTo(expectedQuantity);
-        // Assert: 注文の金額が正しい
+        // Assert: 注文の金額が正しいか
         assertThat(order.amount().longValue()).isGreaterThan(0);
         assertThat(order.timestamp().toEpochMilli()).isGreaterThanOrEqualTo(before.toEpochMilli());
+
+        // Assert: DBに保存されているか
+        verify(orderRepositoryMock).save(any(Order.class));
+        verify(productRepositoryMock).updatedProduct(any(Product.class));
     }
 
     // 存在する予約商品の商品コードで注文したとき、成功する
     @Test
-    public void testProcessWhenReservationOrderSucceeded() throws Exception {
+    public void testProcessOrderWhenReservationOrderSucceeded() throws Exception {
         String expectedProductCode = "reservation-test";
         int expectedQuantity = new Random().nextInt(1, 10);
         Instant before = Instant.now();
         int stock = 10;
 
         ProductRepository productRepositoryMock = mock(ProductRepository.class);
-        // Arrange: 注文の商品コードが存在する
+        // Arrange: 商品が予約商品のとき
+        // Arrange: 注文の商品コードが存在するとき
         when(productRepositoryMock.findByCode(anyString()))
                 .thenReturn(
                         Optional.of(
@@ -125,12 +132,17 @@ public class OrderServiceTest {
         }
 
         assertThat(order.id()).isNotBlank();
-        // Assert: 注文の商品コードが一致する
+        // Assert: 注文の商品コードが一致するか
         assertThat(order.productCode()).isEqualTo(expectedProductCode);
-        // Assert: 注文の数量が一致する
+        // Assert: 注文の数量が一致するか
         assertThat(order.quantity()).isEqualTo(expectedQuantity);
-        // Assert: 注文の金額が正しい
+        // Assert: 注文の金額が正しいか
         assertThat(order.amount().longValue()).isGreaterThan(0);
         assertThat(order.timestamp().toEpochMilli()).isGreaterThanOrEqualTo(before.toEpochMilli());
+
+        // Assert: DBに保存されているか
+        verify(orderRepositoryMock).save(any(Order.class));
+        // Assert: 予約商品の場合、商品情報の更新は行わないか
+        verify(productRepositoryMock, never()).updatedProduct(any(Product.class));
     }
 }
